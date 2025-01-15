@@ -20,9 +20,9 @@ pip install -r requirements.txt
 
 2. **Initialiser la base de données**
 
-Peut se faire avec les script dans backend/ressources ou alors avec
+Peut se faire avec les scripts dans backend/ressources ou alors avec
 ```
-mysql -u root -p < backend\ressources\database_creation.sql.sql
+mysql -u root -p < backend\ressources\database_creation.sql
 ```
 
 Puis ajouter des données de test
