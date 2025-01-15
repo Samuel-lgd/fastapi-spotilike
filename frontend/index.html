@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotilike</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            background-color: #222;
+            color: #fff;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        .item {
+            border: 1px solid #ccc;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <nav>
+        <a href="#" @click="fetchAlbums">Albums</a>
+        <a href="#" @click="fetchArtists">Artists</a>
+    </nav>
+    <div class="container">
+        <template v-if="view === 'albums'">
+            <h1>Albums</h1>
+            <div v-for="album in albums" :key="album.id" class="item">
+                <h2>{{ album.title }}</h2>
+                <img :src="album.cover_image" :alt="album.title" width="100">
+                <p>Release Date: {{ album.release_date }}</p>
+                <button @click="fetchAlbumDetails(album.id)">View Details</button>
+            </div>
+        </template>
+        <template v-if="view === 'artists'">
+            <h1>Artists</h1>
+            <div v-for="artist in artists" :key="artist.id" class="item">
+                <h2>{{ artist.name }}</h2>
+                <img :src="artist.avatar" :alt="artist.name" width="100">
+                <p>{{ artist.biography }}</p>
+                <button @click="fetchArtistDetails(artist.id)">View Details</button>
+            </div>
+        </template>
+        <template v-if="view === 'albumDetails'">
+            <h1>{{ albumDetails.title }}</h1>
+            <img :src="albumDetails.cover_image" :alt="albumDetails.title" width="200">
+            <p>Release Date: {{ albumDetails.release_date }}</p>
+            <h2>Songs</h2>
+            <ul>
+                <li v-for="song in albumSongs" :key="song.id">
+                    {{ song.title }} ({{ song.duration }})
+                </li>
+            </ul>
+        </template>
+        <template v-if="view === 'artistDetails'">
+            <h1>{{ artistDetails.name }}</h1>
+            <img :src="artistDetails.avatar" :alt="artistDetails.name" width="200">
+            <p>{{ artistDetails.biography }}</p>
+        </template>
+    </div>
+</div>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                view: 'albums',
+                albums: [],
+                artists: [],
+                albumDetails: {},
+                albumSongs: [],
+                artistDetails: {}
+            };
+        },
+        methods: {
+            async fetchAlbums() {
+                const response = await fetch('http://localhost:8000/api/albums');
+                this.albums = await response.json();
+                this.view = 'albums';
+            },
+            async fetchArtists() {
+                const response = await fetch('http://localhost:8000/api/artists');
+                this.artists = await response.json();
+                this.view = 'artists';
+            },
+            async fetchAlbumDetails(id) {
+                const albumResponse = await fetch(`http://localhost:8000/api/albums/${id}`);
+                this.albumDetails = await albumResponse.json();
+                const songsResponse = await fetch(`http://localhost:8000/api/albums/${id}/songs`);
+                this.albumSongs = await songsResponse.json();
+                this.view = 'albumDetails';
+            },
+            async fetchArtistDetails(id) {
+                const response = await fetch(`http://localhost:8000/api/artists/${id}`);
+                this.artistDetails = await response.json();
+                this.view = 'artistDetails';
+            }
+        },
+        mounted() {
+            this.fetchAlbums();
+        }
+    });
+
+    app.mount('#app');
+</script>
+</body>
+</html>
