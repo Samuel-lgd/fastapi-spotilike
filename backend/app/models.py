@@ -22,6 +22,7 @@ class Song(Base):
     title = Column(String, index=True)
     duration = Column(String)
     genre_id = Column(Integer, ForeignKey("genres.id"))
+    artist_id = Column(Integer, ForeignKey("artist.id"))
     album_id = Column(Integer, ForeignKey("albums.id"))
     album = relationship("Album", back_populates="songs")
 

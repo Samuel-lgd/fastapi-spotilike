@@ -39,6 +39,19 @@ def create_album(album: AlbumCreate, db: Session = Depends(get_db)):
     db.refresh(db_album)
     return db_album
 
+@router.put("/api/albums/edit/{id}", response_model=AlbumResponse)
+def update_album(id: int, album: AlbumCreate, db: Session = Depends(get_db)):
+    db_album = db.query(Album).filter(Album.id == id).first()
+    if not db_album:
+        raise HTTPException(status_code=404, detail="Album not found")
+
+    for key, value in album.dict().items():
+        setattr(db_album, key, value)
+
+    db.commit()    
+    db.refresh(db_album) 
+    return db_album
+
 
 @router.delete("/api/albums/{id}")
 def delete_album(id: int, db: Session = Depends(get_db)):

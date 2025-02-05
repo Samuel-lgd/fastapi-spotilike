@@ -1,41 +1,141 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spotilike</title>
+    <!-- Inclusion de Vue 3 -->
     <script src="https://unpkg.com/vue@3"></script>
+    <!-- Police Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        body, html {
             margin: 0;
             padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: #121212;
+            color: #ffffff;
+            line-height: 1.6;
         }
 
         nav {
-            background-color: #222;
-            color: #fff;
-            padding: 10px;
+            background: #1f1f1f;
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-
         nav a {
-            color: #fff;
+            color: #ffffff;
             text-decoration: none;
+            margin: 0 20px;
+            font-size: 1.1em;
+            position: relative;
+            transition: color 0.3s;
         }
-
+        nav a::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #1db954;
+            transition: width 0.3s, left 0.3s;
+        }
         nav a:hover {
-            text-decoration: underline;
+            color: #1db954;
+        }
+        nav a:hover::after {
+            width: 100%;
+            left: 0;
         }
 
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
+        h1 {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1db954;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
 
-        .item {
-            border: 1px solid #ccc;
-            margin: 10px;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        /* Cartes (cards) pour les items */
+        .card {
+            background: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .card img {
+            width: 100%;
+            display: block;
+        }
+        .card-content {
+            padding: 15px;
+        }
+        .card-content h2 {
+            margin: 0 0 10px;
+            font-size: 1.3em;
+            color: #1db954;
+        }
+        .card-content p {
+            font-size: 0.95em;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        .btn {
+            background: #1db954;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.9em;
+        }
+        .btn:hover {
+            background: #17a44c;
+        }
+
+        .details {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .details img {
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .details p {
+            max-width: 800px;
+        }
+        .details ul {
+            list-style: none;
+            padding: 0;
+            width: 100%;
+            max-width: 600px;
+        }
+        .details ul li {
+            background: #2a2a2a;
+            margin-bottom: 10px;
             padding: 10px;
             border-radius: 5px;
         }
@@ -44,46 +144,70 @@
 <body>
 <div id="app">
     <nav>
-        <a href="#" @click="fetchAlbums">Albums</a>
-        <a href="#" @click="fetchArtists">Artists</a>
+        <a href="#" @click.prevent="fetchAlbums">Albums</a>
+        <a href="#" @click.prevent="fetchArtists">Artistes</a>
     </nav>
     <div class="container">
         <template v-if="view === 'albums'">
             <h1>Albums</h1>
-            <div v-for="album in albums" :key="album.id" class="item">
-                <h2>{{ album.title }}</h2>
-                <img :src="album.cover_image" :alt="album.title" width="100">
-                <p>Release Date: {{ album.release_date }}</p>
-                <button @click="fetchAlbumDetails(album.id)">View Details</button>
+            <div class="grid">
+                <div v-for="album in albums" :key="album.id" class="card">
+                    <img :src="'imgs/' + album.cover_image" :alt="album.title">
+                    <div class="card-content">
+                        <h2>{{ album.title }}</h2>
+                        <p>Date de sortie : {{ album.release_date }}</p>
+                        <button class="btn" @click="fetchAlbumDetails(album.id)">Voir l'album</button>
+                    </div>
+                </div>
             </div>
         </template>
+
         <template v-if="view === 'artists'">
-            <h1>Artists</h1>
-            <div v-for="artist in artists" :key="artist.id" class="item">
-                <h2>{{ artist.name }}</h2>
-                <img :src="artist.avatar" :alt="artist.name" width="100">
-                <p>{{ artist.biography }}</p>
-                <button @click="fetchArtistDetails(artist.id)">View Details</button>
+            <h1>Artistes</h1>
+            <div class="grid">
+                <div v-for="artist in artists" :key="artist.id" class="card">
+                    <img :src="'imgs/' + artist.avatar" :alt="artist.name">
+                    <div class="card-content">
+                        <h2>{{ artist.name }}</h2>
+                        <p>{{ artist.biography }}</p>
+                        <button class="btn" @click="fetchArtistDetails(artist.id)">Voir les détails</button>
+                    </div>
+                </div>
             </div>
         </template>
+
+        <!-- Vue Détails Album -->
         <template v-if="view === 'albumDetails'">
-            <h1>{{ albumDetails.title }}</h1>
-            <img :src="albumDetails.cover_image" :alt="albumDetails.title" width="200">
-            <p>Release Date: {{ albumDetails.release_date }}</p>
-            <h2>Songs</h2>
-            <ul>
-                <li v-for="song in albumSongs" :key="song.id">
-                    {{ song.title }} ({{ song.duration }})
-                </li>
-            </ul>
+            <div class="details">
+                <h1>{{ albumDetails.title }}</h1>
+                <img :src="'imgs/' + albumDetails.cover_image" :alt="albumDetails.title" width="300">
+                <p>Date de sortie : {{ albumDetails.release_date }}</p>
+                <h2>Morceaux</h2>
+                <ul>
+                    <li v-for="song in albumSongs" :key="song.id">
+                        {{ song.title }} ({{ song.duration }})
+                    </li>
+                </ul>
+            </div>
         </template>
+
+        <!-- Vue Détails Artiste -->
         <template v-if="view === 'artistDetails'">
-            <h1>{{ artistDetails.name }}</h1>
-            <img :src="artistDetails.avatar" :alt="artistDetails.name" width="200">
-            <p>{{ artistDetails.biography }}</p>
+            <div class="details">
+                <h1>{{ artistDetails.name }}</h1>
+                <img :src="'imgs/' + artistDetails.avatar" :alt="artistDetails.name" width="300">
+                <p>{{ artistDetails.biography }}</p>
+                <h2>Morceaux</h2>
+                <ul>
+                    <li v-for="song in artistSongs" :key="song.id">
+                        {{ song.title }} ({{ song.duration }})
+                    </li>
+                </ul>
+            </div>
         </template>
     </div>
 </div>
+
 <script>
     const app = Vue.createApp({
         data() {
@@ -93,7 +217,8 @@
                 artists: [],
                 albumDetails: {},
                 albumSongs: [],
-                artistDetails: {}
+                artistDetails: {},
+                artistSongs: [],
             };
         },
         methods: {
@@ -117,6 +242,8 @@
             async fetchArtistDetails(id) {
                 const response = await fetch(`http://localhost:8000/api/artists/${id}`);
                 this.artistDetails = await response.json();
+                const responseSongs = await fetch(`http://localhost:8000/api/artists/${id}/songs`);
+                this.artistSongs = await responseSongs.json();
                 this.view = 'artistDetails';
             }
         },
@@ -124,7 +251,6 @@
             this.fetchAlbums();
         }
     });
-
     app.mount('#app');
 </script>
 </body>

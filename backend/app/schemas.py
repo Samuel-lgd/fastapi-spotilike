@@ -1,6 +1,6 @@
 from datetime import date, time
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class AlbumBase(BaseModel):
@@ -17,8 +17,7 @@ class AlbumCreate(AlbumBase):
 class AlbumResponse(AlbumBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ArtistBase(BaseModel):
@@ -26,24 +25,28 @@ class ArtistBase(BaseModel):
     avatar: str
     biography: str
 
+class ArtistCreate(ArtistBase):
+    pass
 
 class ArtistResponse(ArtistBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class GenreBase(BaseModel):
     title: str
     description: str
+    
+    
+class GenreCreate(GenreBase):
+    pass
 
 
 class GenreResponse(GenreBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class SongBase(BaseModel):
@@ -55,8 +58,7 @@ class SongBase(BaseModel):
 class SongResponse(SongBase):
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class UserCreate(BaseModel):
